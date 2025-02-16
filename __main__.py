@@ -50,21 +50,20 @@ class WfiRguAP:
     args = parser.parse_args() """
 
 
-def init_apache2(self):
-    print(f"[+] Launching Appache Server & HTML Page")
+def init_apache2():
+    print("[+] Launching Apache Server & HTML Page")
     try:
-        subprocess.run(['python3', '-m', 'http.server', '--bind', '127.0.0.1', '9000'],check=True)
-        subprocess.run(['echo', HTML_PAGE , '>', '~/index.html' ], check=True)
-        return f"Success creating HTML Page"
-    except subprocess.CalledProcessError as e:
-        print(f"[-] Error during server creation")
+        subprocess.run(['python3', '-m', 'http.server', '--bind', '127.0.0.1', '9000'], check=True)
+        subprocess.run(['cp', HTML_PAGE, '~/index.html'], check=True)
+        print("Success creating HTML Page")
+    except subprocess.CalledProcessError:
+        print("[-] Error during server creation")
         sys.exit(1)
 
 def start():
-    print(f"[+] Launching Attack")
+    print("[+] Launching Attack")
     init_apache2()
 
 
-
-
-start()
+if __name__ == "__main__":
+    start()
