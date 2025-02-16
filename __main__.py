@@ -60,7 +60,7 @@ def init_apache2(self):
         print(f"[-] Error during server creation")
         sys.exit(1)
 
-def start(self):
+def start():
     print(f"[+] Launching Attack")
     init_apache2()
 
